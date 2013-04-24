@@ -5,6 +5,7 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.lang.Object;
 
 public class functions {
    
@@ -25,7 +26,7 @@ public class functions {
     /*
      * Given the file url, provide HTTP reponses accordingly
      */
-    public static void Get(String url, DataOutputStream toClient, int port) throws Exception {
+    public static void HTTP_Get(String url, DataOutputStream toClient, int port, Hashtable<String, String> files) throws Exception {
         String message = hardcoded_message();
 
         // if attempt to get the favicon, do nothing

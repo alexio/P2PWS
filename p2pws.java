@@ -8,11 +8,13 @@ public class p2pws implements Runnable{
 
 	Hashtable<String, String> files;
 	Socket conn;
+    int current_port;
 
-	p2pws(Socket sock){
+	p2pws(Socket sock, int socket){
 		this.conn = sock;
-		files = new Hashtable<String, String>();
-	}
+		this.files = new Hashtable<String, String>();
+	    this.current_port = socket;
+    }
 
 	public static void main(String[] args){
 
@@ -39,7 +41,7 @@ public class p2pws implements Runnable{
 				System.out.println("Connection Established");
 
 				//create thread for each new connection
-				new Thread(new p2pws(conn)).start();
+				new Thread(new p2pws(conn, port)).start();
 			}
 		}
 		catch(IOException e){
@@ -67,7 +69,14 @@ public class p2pws implements Runnable{
 				//Check to see if the line contains a valid request
 				if((tokens[0].equals("PUT") || tokens[0].equals("DELETE")) && tokens.length == 3){
 					HTTP_Request(tokens, fromClient);
-				}
+				} else if (tokens[0].equals("GET")) {
+                    try {
+                        functions.HTTP_Get(tokens[1], toClient, current_port, files);
+                    } catch (Exception e) {
+                        System.out.println(e);
+                    }
+                }
+
 				toClient.writeBytes("Ok\n");
 			}
 			System.out.println("Closing the connection.");
