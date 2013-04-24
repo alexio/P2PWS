@@ -36,7 +36,6 @@ public class functions {
 
         // if file path is 'local.html', respond with predefined HTTP 200 OK response
         if (url.equals("/local.html")) {
-            String 
             message += "<p> This is the local page on peer sever " + InetAddress.getLocalHost() + " port " + port + "\n";
             message += "</body>\n</html>\n";
             toClient.writeBytes(message);
