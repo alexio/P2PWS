@@ -2,13 +2,16 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.lang.Object;
 
 public class p2pws implements Runnable{
 
+	Hashtable<String, String> files;
 	Socket conn;
 
 	p2pws(Socket sock){
 		this.conn = sock;
+		files = new Hashtable<String, String>();
 	}
 
 	public static void main(String[] args){
@@ -59,7 +62,12 @@ public class p2pws implements Runnable{
 			// continues to read client inputs till 'end' to end the connection
 			while ((line = fromClient.readLine()) != null) {
 				System.out.println("read \"" + line + "\"");
-				HTTP_Request(line);
+				
+				String tokens[] = line.split(" ");
+				//Check to see if the line contains a valid request
+				if((tokens[0].equals("PUT") || tokens[0].equals("DELETE")) && tokens.length == 3){
+					HTTP_Request(tokens, fromClient);
+				}
 				toClient.writeBytes("Ok\n");
 			}
 			System.out.println("Closing the connection.");
@@ -71,8 +79,25 @@ public class p2pws implements Runnable{
 	}
 
 	//Evaluates received request from client/peer
-	public void HTTP_Request(String input){
-		
+	public void HTTP_Request(String[] input, BufferedReader fromClient){
+
+		switch(input[0]){
+			case "PUT":
+				try{
+					wsPUT(input, fromClient);
+				}
+				catch(IOException e){
+					System.out.println(e);
+					return;
+				}
+				break;
+			case "DELETE":
+				wsDELETE(input, fromClient);
+				break;
+			default:
+				System.out.println("Incorrect Input");
+				break;
+		}
 	}
 
 	public String response(String cmd){
@@ -83,5 +108,28 @@ public class p2pws implements Runnable{
 			default: //request was a success
 				return "HTTP/1.1 200 OK\nContent-Length: 0";
 		}
+	}
+
+	public void wsPUT(String[] input, BufferedReader fromClient) throws IOException{
+		//removes content-length line
+		String line = fromClient.readLine();
+		String size[] = line.split(" ");
+		int limit = Integer.parseInt(size[1]); //Get the Content-Length: ?
+
+		String content = "";
+		while (limit > 0) { //Loop will run until the Content-length is 0 or less
+
+			line = fromClient.readLine();
+			limit-=line.length();
+			limit--;
+			content+=line;
+		}
+		content+=line;
+		files.put(input[2], content);
+	}	
+
+	public void wsDELETE(String[] input, BufferedReader fromClient){
+		String dlt_file = input[1];
+		//Remove file content from hash map
 	}
 }

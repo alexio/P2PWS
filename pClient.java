@@ -88,14 +88,8 @@ public class pClient {
 			System.out.println("Incorrect input");
 			return;
 		}
-
-		//User didn't issue a PUT/DELETE command as the first argument
-		if(!result[0].equals("PUT") || !result[0].equals("DELETE")){ 
-			System.out.println("Incorrect input");
-			return;
-		}
  	
-	 	if(result[0].equalsIgnoreCase("PUT")){ //PUT Command
+	 	if(result[0].equals("PUT")){ //PUT Command
 	 		String file; //Will contain contents of read file
 			try{
 				System.out.println("File: " + result[1]);
@@ -108,7 +102,6 @@ public class pClient {
 			}
 
 			try{
-				System.out.println("File!:" + file);
 				/*Send Put request to Server*/
 				toServer.writeBytes(result[0] + " " + result[1]+" HTTP/1.1\n");
 				toServer.writeBytes("Content-Length: "+file.length()+"\n");
@@ -119,7 +112,7 @@ public class pClient {
 				return;
 			}
 		}
-		else{ //Command DELETE was inputed
+		else if(result[0].equals("DELETE")){ //Command DELETE was inputed
 
 			try{
 				/*Send DELETE request to Server*/
@@ -129,6 +122,10 @@ public class pClient {
 				System.out.println(e);
 				return;
 			}
+		}
+		else{
+			System.out.println("Incorrect input");
+			return;
 		}
 
 	}
