@@ -63,27 +63,24 @@ public class p2pws implements Runnable{
 			String line;
 			// boolean for closing the connectiong
 			boolean quit = false;
-
+            line = fromClient.readLine();
+            //if (line != null) {
 			// continues to read client inputs till 'end' to end the connection
 			while ((line = fromClient.readLine()) != null) {
-				System.out.println("read \"" + line + "\"");
+                //System.out.println("read \"" + line + "\"");
 				//line = line.replace("\n", ""); //get rid of newline chars
 				String tokens[] = line.split(" ");
 				//Check to see if the line contains a valid request
-				if((tokens[0].equals("PUT") || tokens[0].equals("DELETE")) && tokens.length == 3){
-					HTTP_Request(tokens, fromClient);
-				} else if (tokens[0].equals("GET")) {
-                    try {
-                        functions.HTTP_Get(tokens[1], toClient, current_port, files);
-                    } catch (Exception e) {
-                        System.out.println(e);
-                    }
+				if((tokens[0].equals("PUT") || 
+					tokens[0].equals("DELETE") ||
+					tokens[0].equals("GET")) && tokens.length == 3){
+					HTTP_Request(tokens, fromClient, toClient);
                 }
-
-				toClient.writeBytes("Ok\n");
 			}
 			System.out.println("Closing the connection.");
-			conn.close();
+			fromClient.close();
+            toClient.close();
+            conn.close();
 		} catch (IOException e) {
 			System.out.println(e);
 		}
@@ -91,7 +88,7 @@ public class p2pws implements Runnable{
 	}
 
 	//Evaluates received request from client/peer
-	public void HTTP_Request(String[] input, BufferedReader fromClient) {
+	public void HTTP_Request(String[] input, BufferedReader fromClient, DataOutputStream toClient) {
 
 		switch(input[0]){
 			case "PUT":
@@ -103,6 +100,13 @@ public class p2pws implements Runnable{
 					return;
 				}
 				break;
+			case "GET":
+                try {
+                    functions.HTTP_Get(input[1], toClient, current_port, files);
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
+                break;
 			case "DELETE":
 				wsDELETE(input, fromClient);
 				break;
@@ -149,7 +153,7 @@ public class p2pws implements Runnable{
 		}
 	}
 
-	public String md5Hash(String input) {
+	public static String md5Hash(String input) {
          
         String md5 = null;
         if(null == input) return null;
