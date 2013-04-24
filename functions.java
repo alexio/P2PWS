@@ -9,14 +9,15 @@ import java.security.*;
 import java.math.*;
 
 public class functions {
-	
-    /*
-     * Given the file url, calculate and return the MD5 hash value
-     */
-    public static int MD5(String url) throws Exception {
-        MessageDigest md = MessageDigest.getInstance("MD5");
-        md.update(url.getBytes(), 0, url.length());
-        return (new BigInteger(1, md.digest())).intValue();
+   
+    public static String hardcoded_message() {
+        String hardcoded = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n";
+        hardcoded += "<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\n";
+        hardcoded += "<head>\n";
+        hardcoded += "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n";
+        hardcoded += "</head>\n";
+        hardcoded += "<body>\n";
+        return hardcoded;
     }
 
     public static String Delete(String url) {
@@ -26,22 +27,23 @@ public class functions {
     /*
      * Given the file url, provide HTTP reponses accordingly
      */
-    public static String Get(String url) throws Exception {
-        // if file path is 'local.html', return with HTTP 200 OK response,
-        if (url.equals("local.html")) {
-            
+    public static void Get(String url, DataOutputStream toClient, int port) throws Exception {
+        // if attempt to get the favicon, do nothing
+        if (url.equals("/favicon.ico")) {
+            return;
+        }
+        // if file path is 'local.html', respond with predefined HTTP 200 OK response
+        if (url.equals("/local.html")) {
+            String message = hardcoded_message();
+            message += "<p> This is the local page on peer sever " + InetAddress.getLocalHost() + " port " + port + "\n";
+            message += "</body>\n</html>\n";
+            toClient.writeBytes(message);
         }
 
-        int hashvalue = MD5(url);
-        System.out.println("MD5: " + hashvalue);
-        return null;
+        return;
     }
 
     public static String Put(String url) {
         return null;
-    }
-
-    public static void main(String args[]) throws Exception {
-        Get("local.html");
     }
 }
