@@ -63,18 +63,19 @@ public class p2pws implements Runnable{
 			String line;
 			// boolean for closing the connectiong
 			boolean quit = false;
-            line = fromClient.readLine();
-            //if (line != null) {
 			// continues to read client inputs till 'end' to end the connection
 			while ((line = fromClient.readLine()) != null) {
-                //System.out.println("read \"" + line + "\"");
 				//line = line.replace("\n", ""); //get rid of newline chars
 				String tokens[] = line.split(" ");
 				//Check to see if the line contains a valid request
 				if((tokens[0].equals("PUT") || 
 					tokens[0].equals("DELETE") ||
 					tokens[0].equals("GET")) && tokens.length == 3){
-					HTTP_Request(tokens, fromClient, toClient);
+                    HTTP_Request(tokens, fromClient, toClient);
+                    
+                    if (tokens[0].equals("GET")) {
+                        break;
+                    }
                 }
 			}
 			System.out.println("Closing the connection.");
@@ -99,15 +100,16 @@ public class p2pws implements Runnable{
 					System.out.println(e);
 					return;
 				}
-				break;
+                break;
 			case "GET":
                 try {
                     functions.HTTP_Get(input[1], toClient, current_port, files);
                 } catch (Exception e) {
                     System.out.println(e);
-                }
+                    return;
+			    }
                 break;
-			case "DELETE":
+            case "DELETE":
 				wsDELETE(input, fromClient);
 				break;
 			default:
@@ -164,12 +166,12 @@ public class p2pws implements Runnable{
 	         
 	        //Update input string in message digest
 	        hash.update(input.getBytes(), 0, input.length());
-	 
+	
 	        //Converts message digest value in base 16 (hex)
 	        md5 = new BigInteger(1, hash.digest()).toString(16);
         } 
         catch (NoSuchAlgorithmException e) {
- 
+
             e.printStackTrace();
         }
         return md5;

@@ -38,21 +38,21 @@ public class functions {
             String ip_addr = InetAddress.getLocalHost() + "";
             String[] ip = ip_addr.split("/");
             message += "<p> This is the local page on peer sever " + ip[1] + " port " + port + "\n";
-        } else {
-        
+        } else  {
             boolean found = true;
-            /*
+            String hashkey, hash_result = null;
             try {
-                String hash = p2pws.md5Hash(url);
-                System.out.println("Hashed " + url + " = " + hash);
+                hashkey = p2pws.md5Hash(url);
+                System.out.println("Hashed " + url + " = " + hashkey);
+                hash_result = files.get(hashkey);
             } catch (Exception e) {
                 System.out.println("Error: " + e);
             }
-            */
+            
             // if file path is within this peer
-            if (true) {
+            if (hash_result != null) {
                 // if file doesn't exist, respond with 404 Not Found
-                if (found) {
+                if (!found) {
                     message += "<p>HTTP/1.1 404 Not Found</p>\n";
                 } else { // if file exist, respond with the file content
                     message += "<p>HTTP/1.1 200 OK</p>\n";
