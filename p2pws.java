@@ -70,7 +70,11 @@ public class p2pws implements Runnable{
 				if((tokens[0].equals("PUT") || tokens[0].equals("DELETE")) && tokens.length == 3){
 					HTTP_Request(tokens, fromClient);
 				} else if (tokens[0].equals("GET")) {
-                    functions.HTTP_Get(url, toClient, port, files);
+                    try {
+                        functions.HTTP_Get(tokens[1], toClient, current_port, files);
+                    } catch (Exception e) {
+                        System.out.println(e);
+                    }
                 }
 
 				toClient.writeBytes("Ok\n");
