@@ -79,7 +79,7 @@ public class p2pws implements Runnable{
 	}
 
 	//Evaluates received request from client/peer
-	public void HTTP_Request(String[] input, BufferedReader fromClient){
+	public void HTTP_Request(String[] input, BufferedReader fromClient) {
 
 		switch(input[0]){
 			case "PUT":
@@ -100,7 +100,7 @@ public class p2pws implements Runnable{
 		}
 	}
 
-	public String response(String cmd){
+	public String response(String cmd) {
 
 		switch(cmd){
 			case "1": //if Content not found
@@ -110,7 +110,7 @@ public class p2pws implements Runnable{
 		}
 	}
 
-	public void wsPUT(String[] input, BufferedReader fromClient) throws IOException{
+	public void wsPUT(String[] input, BufferedReader fromClient) throws IOException {
 		//removes content-length line
 		String line = fromClient.readLine();
 		String size[] = line.split(" ");
@@ -125,11 +125,35 @@ public class p2pws implements Runnable{
 			content+=line;
 		}
 		content+=line;
-		files.put(input[2], content);
+		System.out.println("Path: " + input[2]);
+		files.put(md5Hash(input[2]), content);
 	}	
 
-	public void wsDELETE(String[] input, BufferedReader fromClient){
+	public void wsDELETE(String[] input, BufferedReader fromClient) {
 		String dlt_file = input[1];
 		//Remove file content from hash map
 	}
+
+	public String md5Hash(String input) {
+         
+        String md5 = null;
+        if(null == input) return null;
+         
+        try {
+	        //Create MessageDigest object for MD5
+	        MessageDigest hash = MessageDigest.getInstance("MD5");
+	         
+	        //Update input string in message digest
+	        digest.update(input.getBytes(), 0, input.length());
+	 
+	        //Converts message digest value in base 16 (hex)
+	        md5 = new BigInteger(1, hash.digest()).toString(16);
+        } 
+        catch (NoSuchAlgorithmException e) {
+ 
+            e.printStackTrace();
+        }
+        System.out.println("Hash: " + md5);
+        return md5;
+    }
 }
