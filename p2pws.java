@@ -3,6 +3,9 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.lang.Object;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class p2pws implements Runnable{
 
@@ -64,7 +67,7 @@ public class p2pws implements Runnable{
 			// continues to read client inputs till 'end' to end the connection
 			while ((line = fromClient.readLine()) != null) {
 				System.out.println("read \"" + line + "\"");
-				
+				//line = line.replace("\n", ""); //get rid of newline chars
 				String tokens[] = line.split(" ");
 				//Check to see if the line contains a valid request
 				if((tokens[0].equals("PUT") || tokens[0].equals("DELETE")) && tokens.length == 3){
@@ -134,13 +137,16 @@ public class p2pws implements Runnable{
 			content+=line;
 		}
 		content+=line;
-		System.out.println("Path: " + input[2]);
-		files.put(md5Hash(input[2]), content);
+
+		String key = md5Hash(input[1]);
+		files.put(key, content);
 	}	
 
 	public void wsDELETE(String[] input, BufferedReader fromClient) {
-		String dlt_file = input[1];
 		//Remove file content from hash map
+		if(files.remove(md5Hash(input[1])) == null){
+			System.out.println("File Didn't Exist");
+		}
 	}
 
 	public String md5Hash(String input) {
@@ -153,7 +159,7 @@ public class p2pws implements Runnable{
 	        MessageDigest hash = MessageDigest.getInstance("MD5");
 	         
 	        //Update input string in message digest
-	        digest.update(input.getBytes(), 0, input.length());
+	        hash.update(input.getBytes(), 0, input.length());
 	 
 	        //Converts message digest value in base 16 (hex)
 	        md5 = new BigInteger(1, hash.digest()).toString(16);
@@ -162,7 +168,6 @@ public class p2pws implements Runnable{
  
             e.printStackTrace();
         }
-        System.out.println("Hash: " + md5);
         return md5;
     }
 }
