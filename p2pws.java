@@ -7,7 +7,7 @@ public class p2pws implements Runnable{
 
 	Socket conn;
 
-	p2pServer(Socket sock){
+	p2pws(Socket sock){
 		this.conn = sock;
 	}
 
@@ -21,6 +21,7 @@ public class p2pws implements Runnable{
 
 		try{
 			port = Integer.parseInt(args[0]);
+			System.out.println("Port: " + port);
 		}
 		catch(NumberFormatException nfe){
 			System.out.println(nfe);
@@ -46,6 +47,41 @@ public class p2pws implements Runnable{
 	}
 
 	public void run(){
+		try {
+			// input and output to client
+			BufferedReader fromClient = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			DataOutputStream toClient = new DataOutputStream(conn.getOutputStream());
+			// stack to store the client inputs
+			String line;
+			// boolean for closing the connectiong
+			boolean quit = false;
 
+			// continues to read client inputs till 'end' to end the connection
+			while ((line = fromClient.readLine()) != null) {
+				System.out.println("read \"" + line + "\"");
+				HTTP_Request(line);
+				toClient.writeBytes("Ok\n");
+			}
+			System.out.println("Closing the connection.");
+			conn.close();
+		} catch (IOException e) {
+			System.out.println(e);
+		}
+
+	}
+
+	//Evaluates received request from client/peer
+	public void HTTP_Request(String input){
+		
+	}
+
+	public String response(String cmd){
+
+		switch(cmd){
+			case "1": //if Content not found
+				return "HTTP/1.1 404 Not Found\nContent-Length: 0";
+			default: //request was a success
+				return "HTTP/1.1 200 OK\nContent-Length: 0";
+		}
 	}
 }
