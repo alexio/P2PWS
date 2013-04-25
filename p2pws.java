@@ -87,6 +87,7 @@ public class p2pws implements Runnable{
                 }
 			}
 			System.out.println("Closing the connection.");
+            System.out.println(files.values());
             fromClient.close();
             toClient.close();
             conn.close();
@@ -103,7 +104,8 @@ public class p2pws implements Runnable{
 			case "PUT":
 				try{
 					wsPUT(input, fromClient);
-				}
+				    System.out.println(files.values());
+                }
 				catch(IOException e){
 					System.out.println(e);
 					return;
