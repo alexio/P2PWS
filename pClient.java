@@ -70,12 +70,14 @@ public class pClient {
 
 		// continues to read line from client till 'end' to close socket
 		while ((line = userdata.readLine()) != null) {
-			if (line.equals("end")) break; 
+            if (line.equals("end")) { break; }
 
 			clientRequest(toServer, line); //Call the Put Method
 			String result = fromServer.readLine();
 			System.out.println("Server says: " + result);
 		}
+        toServer.close();
+        fromServer.close();
 		sock.close();
 	}
 
@@ -92,7 +94,6 @@ public class pClient {
 	 	if(result[0].equals("PUT")){ //PUT Command
 	 		String file; //Will contain contents of read file
 			try{
-				System.out.println("File: " + result[1]);
 				/*Attempt to read file*/
 				file = fileScan(result[1]);
 			}
@@ -106,6 +107,7 @@ public class pClient {
 				toServer.writeBytes(result[0] + " " + result[1]+" HTTP/1.1\n");
 				toServer.writeBytes("Content-Length: "+file.length()+"\n");
 				toServer.writeBytes(file + "\n");
+                System.out.println("Successfully PUT: " + result[1]);
 			}
 			catch(IOException e){
 				System.out.println(e);

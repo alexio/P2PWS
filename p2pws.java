@@ -1,4 +1,7 @@
-/*Alexio Mota*/
+/*
+ * @arthur Alexio Mota
+ * @arthur Hua Yang
+ */
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -9,22 +12,27 @@ import java.security.NoSuchAlgorithmException;
 
 public class p2pws implements Runnable{
 
-	Hashtable<String, String> files;
+    // global hash table to store the file
+	static Hashtable<String, String> files;
 	Socket conn;
     int current_port;
 
+    // constructor
 	p2pws(Socket sock, int socket){
 		this.conn = sock;
-		this.files = new Hashtable<String, String>();
+		//this.files = new Hashtable<String, String>();
 	    this.current_port = socket;
     }
 
 	public static void main(String[] args){
 
 		int port;
-		if(args.length != 1){
-			System.out.println("Invalid number of arguments\n");
-			return;
+        files = new Hashtable<String, String>();
+        if(args.length != 1){
+			System.out.println("Invalid number of arguments");
+			System.out.println("Format:");
+            System.out.println("java p2pws [port number]");
+            return;
 		}
 
 		try{
@@ -63,27 +71,25 @@ public class p2pws implements Runnable{
 			String line;
 			// boolean for closing the connectiong
 			boolean quit = false;
-
 			// continues to read client inputs till 'end' to end the connection
 			while ((line = fromClient.readLine()) != null) {
-				System.out.println("read \"" + line + "\"");
 				//line = line.replace("\n", ""); //get rid of newline chars
 				String tokens[] = line.split(" ");
 				//Check to see if the line contains a valid request
-				if((tokens[0].equals("PUT") || tokens[0].equals("DELETE")) && tokens.length == 3){
-					HTTP_Request(tokens, fromClient);
-				} else if (tokens[0].equals("GET")) {
-                    try {
-                        functions.HTTP_Get(tokens[1], toClient, current_port, files);
-                    } catch (Exception e) {
-                        System.out.println(e);
+				if((tokens[0].equals("PUT") || 
+					tokens[0].equals("DELETE") ||
+					tokens[0].equals("GET")) && tokens.length == 3){
+                    HTTP_Request(tokens, fromClient, toClient);
+                    
+                    if (tokens[0].equals("GET")) {
+                        break;
                     }
                 }
-
-				toClient.writeBytes("Ok\n");
 			}
 			System.out.println("Closing the connection.");
-			conn.close();
+            fromClient.close();
+            toClient.close();
+            conn.close();
 		} catch (IOException e) {
 			System.out.println(e);
 		}
@@ -91,7 +97,7 @@ public class p2pws implements Runnable{
 	}
 
 	//Evaluates received request from client/peer
-	public void HTTP_Request(String[] input, BufferedReader fromClient) {
+	public void HTTP_Request(String[] input, BufferedReader fromClient, DataOutputStream toClient) {
 
 		switch(input[0]){
 			case "PUT":
@@ -102,8 +108,16 @@ public class p2pws implements Runnable{
 					System.out.println(e);
 					return;
 				}
-				break;
-			case "DELETE":
+                break;
+			case "GET":
+                try {
+                    functions.HTTP_Get(input[1], toClient, current_port, files);
+                } catch (Exception e) {
+                    System.out.println(e);
+                    return;
+			    }
+                break;
+            case "DELETE":
 				wsDELETE(input, fromClient);
 				break;
 			default:
@@ -139,8 +153,8 @@ public class p2pws implements Runnable{
 		content+=line;
 
 		String key = md5Hash(input[1]);
-		files.put(key, content);
-	}	
+        files.put(key, content);
+    }	
 
 	public void wsDELETE(String[] input, BufferedReader fromClient) {
 		//Remove file content from hash map
@@ -149,7 +163,7 @@ public class p2pws implements Runnable{
 		}
 	}
 
-	public String md5Hash(String input) {
+	public static String md5Hash(String input) {
          
         String md5 = null;
         if(null == input) return null;
@@ -160,12 +174,12 @@ public class p2pws implements Runnable{
 	         
 	        //Update input string in message digest
 	        hash.update(input.getBytes(), 0, input.length());
-	 
+	
 	        //Converts message digest value in base 16 (hex)
 	        md5 = new BigInteger(1, hash.digest()).toString(16);
         } 
         catch (NoSuchAlgorithmException e) {
- 
+
             e.printStackTrace();
         }
         return md5;

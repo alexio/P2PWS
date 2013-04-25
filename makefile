@@ -6,6 +6,7 @@ JC = javac
 
 CLASSES = \
 		  functions.java \
+		  pClient.java \
 		  p2pws.java
 
 default: classes
