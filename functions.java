@@ -38,12 +38,13 @@ public class functions {
             String ip_addr = InetAddress.getLocalHost() + "";
             String[] ip = ip_addr.split("/");
             message += "<p> This is the local page on peer sever " + ip[1] + " port " + port + "\n";
-        } else  {
+        } 
+        else  { // checks the location of the url with the hashtable
             boolean found = true;
             String hashkey, hash_result = null;
+            
             try {
-                hashkey = p2pws.md5Hash(url);
-                System.out.println("Hashed " + url + " = " + hashkey);
+                hashkey = p2pws.md5Hash(url.substring(1));
                 hash_result = files.get(hashkey);
             } catch (Exception e) {
                 System.out.println("Error: " + e);
@@ -56,7 +57,8 @@ public class functions {
                     message += "<p>HTTP/1.1 404 Not Found</p>\n";
                 } else { // if file exist, respond with the file content
                     message += "<p>HTTP/1.1 200 OK</p>\n";
-                    message += "<p>Content-Length:</p>\n";
+                    message += "<p>Content-Length: " + hash_result.getBytes().length + "</p>\n";
+                    message += "<p>" + hash_result + "</p>\n";
                 }
             } else { // search peer for the file
                 message += "<p>HTTP/1.1 301 Moved Permanently</p>\n";

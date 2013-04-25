@@ -1,4 +1,7 @@
-/*Alexio Mota*/
+/*
+ * @arthur Alexio Mota
+ * @arthur Hua Yang
+ */
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -9,22 +12,27 @@ import java.security.NoSuchAlgorithmException;
 
 public class p2pws implements Runnable{
 
-	Hashtable<String, String> files;
+    // global hash table to store the file
+	static Hashtable<String, String> files;
 	Socket conn;
     int current_port;
 
+    // constructor
 	p2pws(Socket sock, int socket){
 		this.conn = sock;
-		this.files = new Hashtable<String, String>();
+		//this.files = new Hashtable<String, String>();
 	    this.current_port = socket;
     }
 
 	public static void main(String[] args){
 
 		int port;
-		if(args.length != 1){
-			System.out.println("Invalid number of arguments\n");
-			return;
+        files = new Hashtable<String, String>();
+        if(args.length != 1){
+			System.out.println("Invalid number of arguments");
+			System.out.println("Format:");
+            System.out.println("java p2pws [port number]");
+            return;
 		}
 
 		try{
@@ -79,7 +87,7 @@ public class p2pws implements Runnable{
                 }
 			}
 			System.out.println("Closing the connection.");
-			fromClient.close();
+            fromClient.close();
             toClient.close();
             conn.close();
 		} catch (IOException e) {
@@ -145,8 +153,8 @@ public class p2pws implements Runnable{
 		content+=line;
 
 		String key = md5Hash(input[1]);
-		files.put(key, content);
-	}	
+        files.put(key, content);
+    }	
 
 	public void wsDELETE(String[] input, BufferedReader fromClient) {
 		//Remove file content from hash map
