@@ -145,7 +145,7 @@ public class p2pws implements Runnable{
 	public void wsDELETE(String[] input, BufferedReader fromClient) {
 		//Remove file content from hash map
 		if(files.remove(md5Hash(input[1])) == null){
-			System.out.println("File Didn't Exist");
+			
 		}
 	}
 
