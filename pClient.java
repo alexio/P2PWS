@@ -116,9 +116,12 @@ public class pClient {
 		}
 		else if(result[0].equals("DELETE")){ //Command DELETE was inputed
 
+
 			try{
+				System.out.println("DELETE!");
 				/*Send DELETE request to Server*/
 				toServer.writeBytes(result[0] + " " + result[1]+" HTTP/1.1\n");
+				System.out.println("Sent!");
 			}
 			catch(IOException e){
 				System.out.println(e);

@@ -79,6 +79,7 @@ public class p2pws implements Runnable{
 				if((tokens[0].equals("PUT") || 
 					tokens[0].equals("DELETE") ||
 					tokens[0].equals("GET")) && tokens.length == 3){
+					
                     HTTP_Request(tokens, fromClient, toClient);
                     
                     if (tokens[0].equals("GET")) {
@@ -101,8 +102,9 @@ public class p2pws implements Runnable{
 
 		switch(input[0]){
 			case "PUT":
+
 				try{
-					wsPUT(input, fromClient);
+					wsPUT(input, fromClient, toClient);
 				}
 				catch(IOException e){
 					System.out.println(e);
@@ -118,7 +120,7 @@ public class p2pws implements Runnable{
 			    }
                 break;
             case "DELETE":
-				wsDELETE(input, fromClient);
+				wsDELETE(input, fromClient, toClient);
 				break;
 			default:
 				System.out.println("Incorrect Input");
@@ -126,18 +128,19 @@ public class p2pws implements Runnable{
 		}
 	}
 
-	public String response(String cmd) {
+	public String response(int cmd) {
 
 		switch(cmd){
-			case "1": //if Content not found
+			case 1: //if Content not found
 				return "HTTP/1.1 404 Not Found\nContent-Length: 0";
 			default: //request was a success
-				return "HTTP/1.1 200 OK\nContent-Length: 0";
+				return "HTTP/1.1 200 OK \nContent-Length: 0";
 		}
 	}
 
-	public void wsPUT(String[] input, BufferedReader fromClient) throws IOException {
+	public void wsPUT(String[] input, BufferedReader fromClient, DataOutputStream toClient) throws IOException {
 		//removes content-length line
+		System.out.println("In put!");
 		String line = fromClient.readLine();
 		String size[] = line.split(" ");
 		int limit = Integer.parseInt(size[1]); //Get the Content-Length: ?
@@ -150,16 +153,26 @@ public class p2pws implements Runnable{
 			limit--;
 			content+=line;
 		}
-		content+=line;
 
 		String key = md5Hash(input[1]);
-        files.put(key, content);
+		if(!files.contains(key)){
+			files.put(key, content);
+		}
+        toClient.writeBytes(response(0));
     }	
 
-	public void wsDELETE(String[] input, BufferedReader fromClient) {
+	public void wsDELETE(String[] input, BufferedReader fromClient, DataOutputStream toClient) {
 		//Remove file content from hash map
-		if(files.remove(md5Hash(input[1])) == null){
-			
+		try{
+			System.out.println("HERE: "+ input[1] + " " + files.get(md5Hash(input[1])));
+			if(files.remove(md5Hash(input[1])) == null){
+				toClient.writeBytes(response(1));
+			}
+			toClient.writeBytes(response(0));
+			System.out.println("Check: "+ input[1] + " " + files.get(md5Hash(input[1])));
+		}
+		catch(IOException e){
+			System.out.println(e);
 		}
 	}
 
