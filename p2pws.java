@@ -88,6 +88,7 @@ public class p2pws implements Runnable{
                 }
 			}
 			System.out.println("Closing the connection.");
+            System.out.println(files.values());
             fromClient.close();
             toClient.close();
             conn.close();

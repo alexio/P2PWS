@@ -104,10 +104,10 @@ public class pClient {
 
 			try{
 				/*Send Put request to Server*/
-				toServer.writeBytes(result[0] + " " + result[1]+" HTTP/1.1\n");
+                toServer.writeBytes(result[0] + " " + result[1]+" HTTP/1.1\n");
 				toServer.writeBytes("Content-Length: "+file.length()+"\n");
 				toServer.writeBytes(file + "\n");
-                System.out.println("Successfully PUT: " + result[1]);
+                System.out.println("Successfully PUT");
 			}
 			catch(IOException e){
 				System.out.println(e);
